@@ -3,11 +3,13 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=0:4285F4,100:34A853&height=180&section=header&text=Node.js%20Gemini%20AI&fontSize=52&fontColor=ffffff&fontAlignY=38&desc=Google%20Gemini%20AI%20Integration%20with%20Node.js%20%7C%20Express%20%7C%20Chat%20%7C%20BMI%20AI&descAlignY=60&descSize=14" width="100%"/>
 
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini%20AI-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![Express](https://img.shields.io/badge/Express-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
+[![GCP Cloud Run](https://img.shields.io/badge/GCP_Cloud_Run-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
+[![Live Demo](https://img.shields.io/badge/Live_Platform-28a745?style=for-the-badge)](https://ai-rag-wellness-assistant-266670750120.asia-south1.run.app)
 [![License](https://img.shields.io/badge/License-MIT-34A853?style=for-the-badge)](./LICENSE)
 
-> A **Node.js + Express backend** that integrates **Google Gemini AI** (`@google/generative-ai`) to power multiple AI-driven applications — including an interactive chat assistant, BMI AI analyzer, and streaming text generation.
+> A production-grade **AI Mental Health & Wellness Assistant** powered by **Node.js, TypeScript, Google Gemini AI, and a custom RAG (Retrieval-Augmented Generation) Vector Search Engine**. Fully containerized with Docker and deployed to **GCP Cloud Run** via automated keyless CI/CD.
 
 </div>
 
