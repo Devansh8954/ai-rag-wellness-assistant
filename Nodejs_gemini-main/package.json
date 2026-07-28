@@ -1,23 +1,41 @@
 {
-  "name": "chatgpt",
+  "name": "ai-rag-wellness-assistant",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Production-grade RAG-backed AI Mental Health & Wellness Assistant using Google Gemini AI, Vector Context Retrieval, Session Memory, and Safety Guardrails",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "node server_interactive_chat.js",
-    "start": "node server_interactive_chat.js"
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "test": "jest",
+    "test:coverage": "jest --coverage --forceExit"
   },
   "author": "Devansh Tyagi",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "axios": "^1.7.3",
-    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.19.2",
+    "helmet": "^7.1.0",
     "multer": "^1.4.5-lts.1",
-    "openai": "^4.54.0"
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.14.9",
+    "@types/supertest": "^6.0.2",
+    "@typescript-eslint/eslint-plugin": "^7.15.0",
+    "@typescript-eslint/parser": "^7.15.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.1.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.2"
   }
 }

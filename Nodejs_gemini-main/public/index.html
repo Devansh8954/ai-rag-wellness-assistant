@@ -3,35 +3,321 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Mental Health Chatbot</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <title>AI RAG Mental Health & Wellness Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #8b5cf6;
+      --primary-glow: rgba(139, 92, 246, 0.3);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      padding: 1.25rem 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-group { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+    .logo-title { font-size: 1.25rem; font-weight: 700; }
+    .badge-rag {
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid var(--primary);
+      color: #c4b5fd;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1100px;
+      width: 100%;
+      margin: 1.5rem auto;
+      padding: 0 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 1rem;
+    }
+
+    .chat-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      height: 580px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #6d28d9, #4c1d95);
+      color: #f3f4f6;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-model {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: #e5e7eb;
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-crisis {
+      align-self: flex-start;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1.5px solid #ef4444;
+      color: #fca5a5;
+    }
+
+    .rag-badges {
+      margin-top: 0.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .rag-tag {
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid var(--accent-cyan);
+      color: #67e8f9;
+      font-size: 0.725rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .quick-prompts {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.75rem 1.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid var(--card-border);
+    }
+
+    .prompt-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .prompt-chip:hover {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+
+    .input-bar {
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    .disclaimer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
 </head>
 <body>
-<!-- Background animation layer (behind everything) -->
-<div class="background-layer">
-  <div class="stars"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-  <div class="shooting-star"></div>
-</div>
 
-
-  <div class="container">
-    <div class="chat-header">
-      <h1> 🧠AI Mental Health Chatbot</h1>
-    </div>
-    <div class="chat-window">
-      <div id="chat-history" class="chat-history"></div>
-      <div class="input-area">
-        <input type="text" id="message-input" placeholder="Type your message...">
-        <button id="send-button" class="send-button">➤</button>
+  <div class="header">
+    <div class="logo-group">
+      <div class="logo-icon">🌿</div>
+      <div>
+        <div class="logo-title">AI RAG Wellness & Mental Health Platform</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">Grounded Evidence-Based Conversational AI</div>
       </div>
     </div>
+    <span class="badge-rag">⚡ RAG Vector Engine Active</span>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="script.js"></script>
+
+  <div class="container">
+    <div class="chat-card">
+      <div class="chat-messages" id="chatMessages">
+        <div class="message msg-model">
+          👋 Welcome to the <strong>AI RAG Wellness Assistant</strong>. I am grounded in evidence-based psychological grounding techniques, cognitive reframing, and sleep hygiene practices. How can I support your mental well-being today?
+        </div>
+      </div>
+
+      <div class="quick-prompts">
+        <div class="prompt-chip" onclick="sendQuick('Teach me the 5-4-3-2-1 grounding technique')">🧘 5-4-3-2-1 Grounding</div>
+        <div class="prompt-chip" onclick="sendQuick('How does Box Breathing work?')">🫁 Box Breathing</div>
+        <div class="prompt-chip" onclick="sendQuick('Tips for dealing with insomnia and sleep hygiene')">🌙 Sleep Hygiene</div>
+        <div class="prompt-chip" onclick="sendQuick('How can I reframe negative thoughts?')">🧠 Cognitive Reframing</div>
+      </div>
+
+      <div class="input-bar">
+        <input type="text" id="userInput" placeholder="Share how you are feeling or ask a wellness question..." onkeydown="if(event.key==='Enter') sendMessage()" />
+        <button class="btn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      Disclaimer: This AI Assistant is for wellness support and psychoeducation only. It is not a licensed physician or therapist. In emergencies, please call your local crisis hotline.
+    </div>
+  </div>
+
+  <script>
+    const sessionId = 'session-' + Math.random().toString(36).substring(2, 9);
+
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'msg-user');
+      input.value = '';
+
+      const loadingEl = appendMessage('Analyzing query with RAG Vector Retrieval...', 'msg-model');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: text, sessionId })
+        });
+        const data = await res.json();
+
+        loadingEl.remove();
+
+        if (data.isCrisisIntervention) {
+          appendMessage(data.response, 'msg-crisis');
+        } else {
+          appendMessage(data.response, 'msg-model', data.ragContext);
+        }
+      } catch (err) {
+        loadingEl.innerText = 'Unable to reach assistant. Please try again.';
+      }
+    }
+
+    function sendQuick(prompt) {
+      document.getElementById('userInput').value = prompt;
+      sendMessage();
+    }
+
+    function appendMessage(content, typeClass, ragContext = []) {
+      const container = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = `message ${typeClass}`;
+      div.innerHTML = content.replace(/\n/g, '<br/>');
+
+      if (ragContext && ragContext.length > 0) {
+        const ragDiv = document.createElement('div');
+        ragDiv.className = 'rag-badges';
+        ragDiv.innerHTML = '<span style="font-size: 0.7rem; color: var(--text-muted); width: 100%;">Grounded Knowledge:</span>' +
+          ragContext.map(c => `<span class="rag-tag">📚 ${c.title}</span>`).join('');
+        div.appendChild(ragDiv);
+      }
+
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+      return div;
+    }
+  </script>
 </body>
 </html>
