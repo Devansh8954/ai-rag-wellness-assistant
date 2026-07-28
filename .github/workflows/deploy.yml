@@ -14,6 +14,9 @@ jobs:
   test-and-lint:
     name: Lint & Test Gate
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Nodejs_gemini-main
 
     steps:
       - name: Checkout Code
@@ -24,6 +27,7 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+          cache-dependency-path: './Nodejs_gemini-main/package-lock.json'
 
       - name: Install Dependencies
         run: npm ci
@@ -39,6 +43,9 @@ jobs:
     needs: test-and-lint
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Nodejs_gemini-main
 
     permissions:
       contents: read
