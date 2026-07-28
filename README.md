@@ -151,7 +151,11 @@ docker run -d -p 3000:3000 --env-file .env ai-rag-wellness-assistant
 
 ---
 
-## 🎯 Key Architecture & Interview Highlights
+## 🎯 Key Architecture & SDE Interview Guide
+
+Looking for system design decisions, vector search trade-offs, and FAANG-level technical interview answers for this project?
+
+👉 **[Read the Full SDE Technical Interview Prep Guide (Nodejs_gemini-main/docs/interview.md)](Nodejs_gemini-main/docs/interview.md)**
 
 - **Why Custom RAG Vector Search?** Prevents LLM hallucinations by grounding responses in verified CBT wellness documentation using TF-IDF vector similarity.
 - **Safety Interception Pattern:** Prevents dangerous queries from reaching the AI model by running early-gate keyword matching for instant emergency redirection.

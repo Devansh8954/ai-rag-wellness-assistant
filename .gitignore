@@ -21,6 +21,16 @@ dist
 build
 coverage
 docs/
+**/docs/
+INTERVIEW.md
+interview.md
+*interview*
+*Interview*
+*INTERVIEW*
+materials/
+material/
+*.private
+private/
 
 # Temporary files
 tmp

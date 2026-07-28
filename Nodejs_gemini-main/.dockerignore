@@ -3,3 +3,6 @@ dist
 coverage
 .git
 .env
+docs
+INTERVIEW.md
+interview.md

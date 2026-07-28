@@ -32,8 +32,10 @@
       color: var(--text-main);
       font-family: var(--font-sans);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      -webkit-text-size-adjust: 100%;
     }
 
     .header {
@@ -44,6 +46,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
     }
 
     .logo-group { display: flex; align-items: center; gap: 0.75rem; }
@@ -54,8 +57,9 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 1.2rem;
       box-shadow: 0 0 15px var(--primary-glow);
+      flex-shrink: 0;
     }
-    .logo-title { font-size: 1.25rem; font-weight: 700; }
+    .logo-title { font-size: clamp(1.05rem, 3.5vw, 1.25rem); font-weight: 700; line-height: 1.2; }
     .badge-rag {
       background: rgba(139, 92, 246, 0.2);
       border: 1px solid var(--primary);
@@ -64,6 +68,8 @@
       border-radius: 9999px;
       font-size: 0.75rem;
       font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .container {
@@ -85,6 +91,8 @@
       display: flex;
       flex-direction: column;
       height: 580px;
+      max-height: calc(100dvh - 160px);
+      min-height: 380px;
       overflow: hidden;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     }
@@ -93,18 +101,20 @@
       flex: 1;
       padding: 1.5rem;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
 
     .message {
-      max-width: 80%;
-      padding: 1rem 1.25rem;
+      max-width: 82%;
+      padding: 0.9rem 1.15rem;
       border-radius: 14px;
       line-height: 1.6;
       font-size: 0.95rem;
       animation: fadeIn 0.3s ease;
+      word-break: break-word;
     }
 
     @keyframes fadeIn {
@@ -155,9 +165,15 @@
       display: flex;
       gap: 0.5rem;
       overflow-x: auto;
-      padding: 0.75rem 1.5rem;
+      -webkit-overflow-scrolling: touch;
+      padding: 0.75rem 1.25rem;
       background: rgba(0, 0, 0, 0.2);
       border-top: 1px solid var(--card-border);
+      scrollbar-width: none;
+    }
+
+    .quick-prompts::-webkit-scrollbar {
+      display: none;
     }
 
     .prompt-chip {
@@ -170,6 +186,8 @@
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s;
+      flex-shrink: 0;
+      touch-action: manipulation;
     }
 
     .prompt-chip:hover {
@@ -184,6 +202,7 @@
       border-top: 1px solid var(--card-border);
       display: flex;
       gap: 0.75rem;
+      align-items: center;
     }
 
     input[type="text"] {
@@ -193,7 +212,8 @@
       padding: 0.75rem 1rem;
       border-radius: 10px;
       color: var(--text-main);
-      font-size: 0.95rem;
+      font-size: 16px; /* Prevents auto-zoom on iOS */
+      min-height: 44px;
     }
 
     input[type="text"]:focus {
@@ -211,6 +231,11 @@
       cursor: pointer;
       transition: all 0.2s;
       box-shadow: 0 4px 12px var(--primary-glow);
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
     }
 
     .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
@@ -219,7 +244,87 @@
       text-align: center;
       font-size: 0.75rem;
       color: var(--text-muted);
-      margin-top: 0.5rem;
+      margin-top: 0.25rem;
+      padding: 0 0.5rem;
+    }
+
+    /* --- Mobile Responsive Queries --- */
+    @media (max-width: 768px) {
+      .header {
+        padding: 1rem 1.25rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+      }
+
+      .badge-rag {
+        align-self: flex-start;
+      }
+
+      .container {
+        margin: 0.75rem auto;
+        padding: 0 0.75rem;
+      }
+
+      .chat-card {
+        height: calc(100dvh - 160px);
+        min-height: 350px;
+      }
+
+      .chat-messages {
+        padding: 1rem;
+        gap: 0.75rem;
+      }
+
+      .message {
+        max-width: 90%;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.9rem;
+      }
+
+      .input-bar {
+        padding: 0.75rem 0.85rem;
+        gap: 0.5rem;
+      }
+
+      .btn {
+        padding: 0.65rem 1.1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 0.85rem 1rem;
+      }
+
+      .logo-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
+      }
+
+      .container {
+        margin: 0.5rem auto;
+        padding: 0 0.5rem;
+      }
+
+      .chat-card {
+        border-radius: 12px;
+        height: calc(100dvh - 145px);
+      }
+
+      .quick-prompts {
+        padding: 0.5rem 0.75rem;
+      }
+
+      .prompt-chip {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.65rem;
+      }
+
+      .disclaimer {
+        font-size: 0.7rem;
+      }
     }
   </style>
 </head>
