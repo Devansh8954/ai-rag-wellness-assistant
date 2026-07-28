@@ -50,8 +50,9 @@ Please provide a warm, empathetic response grounded in the provided context and 
 
       return responseText;
     } catch (error) {
-      logger.error('Gemini API call error', { error: (error as Error).message });
-      return this.getMockResponse(userPrompt, contextSnippet);
+      const errorMessage = (error as Error).message;
+      logger.error('Gemini API call error', { error: errorMessage });
+      return this.getMockResponse(userPrompt, contextSnippet, errorMessage);
     }
   }
 
@@ -80,11 +81,15 @@ Please provide a warm, empathetic response grounded in the provided context and 
     }
   }
 
-  private getMockResponse(userPrompt: string, contextSnippet: string): string {
+  private getMockResponse(userPrompt: string, contextSnippet: string, apiError?: string): string {
+    const hint = apiError
+      ? `(Note: Gemini API error - ${apiError}. Please verify GEMINI_API_KEY in .env)`
+      : `(Note: Set a valid GEMINI_API_KEY in .env for live AI responses).`;
+
     if (contextSnippet) {
-      return `[RAG Assisted Guidance]\n\nBased on established wellness techniques:\n${contextSnippet.split('\n\n')[0]}\n\nRemember to take deep, intentional breaths and take things one step at a time. (Note: Set GEMINI_API_KEY for live AI responses).`;
+      return `[RAG Assisted Guidance]\n\nBased on established wellness techniques:\n${contextSnippet.split('\n\n')[0]}\n\nRemember to take deep, intentional breaths and take things one step at a time. ${hint}`;
     }
-    return `Thank you for sharing. It sounds like you are navigating a thoughtful moment regarding "${userPrompt}". Practicing deep breathing (Box Breathing: 4s inhale, 4s hold, 4s exhale) can help calm your nervous system. (Note: Set GEMINI_API_KEY for live AI responses).`;
+    return `Thank you for sharing. It sounds like you are navigating a thoughtful moment regarding "${userPrompt}". Practicing deep breathing (Box Breathing: 4s inhale, 4s hold, 4s exhale) can help calm your nervous system. ${hint}`;
   }
 }
 
