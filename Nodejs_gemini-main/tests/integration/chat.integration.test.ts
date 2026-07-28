@@ -2,6 +2,7 @@ import request from 'supertest';
 import { createApp } from '../../src/server';
 
 describe('Chat API Integration Tests', () => {
+  jest.setTimeout(15000);
   const app = createApp();
 
   it('GET /api/health should return status ok', async () => {

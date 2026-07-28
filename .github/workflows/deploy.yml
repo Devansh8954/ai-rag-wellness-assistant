@@ -82,6 +82,7 @@ jobs:
           flags: '--allow-unauthenticated --min-instances=0 --max-instances=2 --memory=512Mi'
           env_vars: |
             NODE_ENV=production
+            GEMINI_MODEL=gemini-3.6-flash
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
       - name: Post-Deployment Health Check
