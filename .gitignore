@@ -1,4 +1,4 @@
-# Node modules
+# Dependencies
 node_modules/
 
 # Logs
@@ -6,28 +6,31 @@ logs
 *.log
 npm-debug.log*
 
-# Environment variables
+# Environment & Credentials
 .env
+.env.*
 *.key
 *.pem
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
 
-
-# Build output
+# Build & Private Docs
 dist
 build
+coverage
+docs/
 
 # Temporary files
 tmp
 temp.js
 /uploads/
 
-# IDE or editor specific files
+# IDE & OS specific files
 .idea/
 .vscode/
 .DS_Store
-
-# Operating system specific files
 Thumbs.db
 ehthumbs.db
-Icon?
 Desktop.ini
