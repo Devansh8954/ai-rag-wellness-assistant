@@ -18,8 +18,6 @@ build
 coverage
 docs/
 
-
-
 # Temporary files
 tmp
 temp.js
