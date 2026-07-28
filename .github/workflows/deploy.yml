@@ -68,7 +68,7 @@ jobs:
 
       - name: Build & Push Container Image
         run: |
-          IMAGE_TAG="asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/ai-rag-wellness-assistant:${{ github.sha }}"
+          IMAGE_TAG="asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api-rate-limiter/ai-rag-wellness-assistant:${{ github.sha }}"
           docker build -t $IMAGE_TAG .
           docker push $IMAGE_TAG
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
