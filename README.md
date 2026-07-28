@@ -83,7 +83,7 @@
 ## 📁 Repository Structure
 
 ```
-node Gemini project/
+ai-rag-wellness-assistant/
 └── Nodejs_gemini-main/
     ├── src/
     │   ├── controllers/           # Route controllers (Chat, Vision, RAG)
@@ -111,8 +111,8 @@ node Gemini project/
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/Devansh8954/node-Gemini-project.git
-cd "node Gemini project/Nodejs_gemini-main"
+git clone https://github.com/Devansh8954/ai-rag-wellness-assistant.git
+cd "ai-rag-wellness-assistant/Nodejs_gemini-main"
 
 # 2. Install dependencies
 npm install
