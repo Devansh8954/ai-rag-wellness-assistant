@@ -73,7 +73,7 @@ jobs:
           service: ai-rag-wellness-assistant
           region: asia-south1
           image: ${{ env.IMAGE_TAG }}
-          flags: '--allow-unauthenticated'
+          flags: '--allow-unauthenticated --min-instances=0 --max-instances=2 --memory=512Mi'
           env_vars: |
             NODE_ENV=production
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
