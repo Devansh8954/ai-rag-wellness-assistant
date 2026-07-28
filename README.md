@@ -1,159 +1,161 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4285F4,100:34A853&height=180&section=header&text=Node.js%20Gemini%20AI&fontSize=52&fontColor=ffffff&fontAlignY=38&desc=Google%20Gemini%20AI%20Integration%20with%20Node.js%20%7C%20Express%20%7C%20Chat%20%7C%20BMI%20AI&descAlignY=60&descSize=14" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4285F4,50:6f42c1,100:34A853&height=220&section=header&text=AI%20RAG%20Wellness%20Assistant&fontSize=52&fontColor=ffffff&fontAlignY=38&desc=Google%20Gemini%20AI%20%7C%20Vector%20RAG%20Engine%20%7C%20Crisis%20Guardrails%20%7C%20GCP%20Cloud%20Run&descAlignY=60&descSize=16" width="100%"/>
 
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
-[![Google Gemini](https://img.shields.io/badge/Google%20Gemini%20AI-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
-[![GCP Cloud Run](https://img.shields.io/badge/GCP_Cloud_Run-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
-[![Live Demo](https://img.shields.io/badge/Live_Platform-28a745?style=for-the-badge)](https://ai-rag-wellness-assistant-266670750120.asia-south1.run.app)
-[![License](https://img.shields.io/badge/License-MIT-34A853?style=for-the-badge)](./LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![Express](https://img.shields.io/badge/Express.js-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com)
+[![Google Gemini AI](https://img.shields.io/badge/Google%20Gemini%20AI-1.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![GCP Cloud Run](https://img.shields.io/badge/GCP_Cloud_Run-Deployed-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
+[![Live Platform](https://img.shields.io/badge/Live_Platform-28a745?style=for-the-badge&logo=googlecloud&logoColor=white)](https://ai-rag-wellness-assistant-266670750120.asia-south1.run.app)
+[![CI/CD WIF](https://img.shields.io/badge/CI%2FCD-GitHub_Actions_WIF-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](.github/workflows)
 
-> A production-grade **AI Mental Health & Wellness Assistant** powered by **Node.js, TypeScript, Google Gemini AI, and a custom RAG (Retrieval-Augmented Generation) Vector Search Engine**. Fully containerized with Docker and deployed to **GCP Cloud Run** via automated keyless CI/CD.
+> An enterprise-grade **AI Mental Health & Wellness Assistant** powered by **Node.js, TypeScript, Google Gemini AI, and a custom RAG (Retrieval-Augmented Generation) Vector Search Engine**. Features real-time safety crisis guardrails, dynamic multi-turn session memory, multimodal image evaluation, and keyless WIF deployment to GCP Cloud Run.
+
+### 🌐 [Live Platform Demo → https://ai-rag-wellness-assistant-266670750120.asia-south1.run.app](https://ai-rag-wellness-assistant-266670750120.asia-south1.run.app)
 
 </div>
 
 ---
 
-## 📋 About This Project
+## 💡 System Architecture
 
-This project demonstrates how to build **Google Gemini AI-powered applications** with Node.js and Express. It includes multiple server implementations showcasing different Gemini AI capabilities — from standard chat completions to streaming responses and domain-specific AI tools.
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          CLIENT INTERFACE                               │
+│              Responsive Interactive Chat UI & Vision Upload             │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │ HTTP / REST API
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     EXPRESS GATEWAY & GUARDRAIL                         │
+│  • CORS & Rate Limiter Middleware                                       │
+│  • Crisis Interception Middleware (988 Emergency Lifeline Intercept)   │
+└────────────────────────────────────┬────────────────────────────────────┘
+                                     │
+           ┌─────────────────────────┴─────────────────────────┐
+           ▼                                                   ▼
+┌───────────────────────────────────┐               ┌───────────────────┐
+│       RAG VECTOR SEARCH ENGINE    │               │  SESSION MANAGER  │
+│ • TF-IDF Cosine Similarity        │               │ • Conversation    │
+│ • Clinical Guidelines Store       │               │   Buffer Memory   │
+│ • Relevant Context Injection      │               │ • State Tracking  │
+└──────────────────┬────────────────┘               └─────────┬─────────┘
+                   │                                          │
+                   └────────────────────┬─────────────────────┘
+                                        ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         GOOGLE GEMINI 1.5 FLASH                         │
+│             Generative Contextual Synthesis & Multimodal Vision         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## ✨ Features
+## ✨ Key Platform Features
 
-| Feature | Server File | Description |
-|---|---|---|
-| 💬 **Standard Chat** | `server.js` | Basic Gemini chat completions API |
-| 🏋️ **BMI AI Analyzer** | `server_bmi.js` | AI-powered BMI calculation with health insights |
-| 🔄 **Interactive Chat** | `server_interactive_chat.js` | Multi-turn conversational AI with history |
-| ⚡ **Streaming Text** | `server_text_stream.js` | Real-time token streaming with Gemini |
+| Capability | Technical Details |
+|---|---|
+| 🔍 **RAG Vector Search Engine** | Custom TF-IDF Cosine Similarity vector engine matching queries against validated CBT and wellness guidelines prior to LLM synthesis. |
+| 🛡️ **Crisis Safety Intercept** | Intercepts high-risk distress keywords at the middleware level, bypassing LLM generation to immediately return 988 Crisis Lifeline resources. |
+| 🧠 **Multi-Turn Session Memory** | Stateful conversation buffer preserving contextual history across multi-turn user dialogs. |
+| 👁️ **Multimodal Vision Analysis** | Image evaluation endpoint leveraging Gemini Vision to analyze environmental context for wellness insights. |
+| ☁️ **GCP Cloud Run Serverless** | Containerized microservice executing on GCP Cloud Run with zero-idle scaling and Workload Identity Federation (WIF) CI/CD. |
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Technology | Purpose |
-|---|---|
-| **Node.js** | JavaScript runtime |
-| **Express.js** | REST API server |
-| **@google/generative-ai** | Official Google Gemini SDK |
-| **OpenAI SDK** | OpenAI-compatible integration |
-| **dotenv** | Secure API key management |
-| **Multer** | File upload middleware |
-| **CORS** | Cross-origin request handling |
-| **Vercel** | Serverless deployment |
+| Layer | Technology | Purpose |
+|---|---|---|
+| **Language** | TypeScript 5.x | Strongly-typed interfaces, domain modeling, OOP patterns |
+| **Runtime** | Node.js 20.x | High-throughput asynchronous backend server |
+| **Web Framework** | Express.js 4.x | RESTful routing, middleware orchestration, static hosting |
+| **AI Model** | Google Gemini 1.5 Flash | LLM reasoning, contextual response synthesis, multimodal vision |
+| **RAG Engine** | TF-IDF + Cosine Similarity | Local vector store & semantic similarity scoring |
+| **Containers** | Docker | Multi-stage slim Docker build (`node:20-alpine`) |
+| **Cloud Hosting** | GCP Cloud Run | Auto-scaling serverless container platform |
+| **CI/CD Pipeline** | GitHub Actions + WIF | Keyless OIDC authentication deployment pipeline |
 
 ---
 
-## 📁 Project Structure
+## 📁 Repository Structure
 
 ```
 node Gemini project/
 └── Nodejs_gemini-main/
-    ├── server.js                    # Basic Gemini chat API
-    ├── server_bmi.js                # BMI + AI health analysis
-    ├── server_interactive_chat.js   # Multi-turn chat with history
-    ├── server_text_stream.js        # Streaming token generation
-    ├── public/                      # Frontend HTML/JS files
-    ├── vercel.json                  # Vercel deployment config
+    ├── src/
+    │   ├── controllers/           # Route controllers (Chat, Vision, RAG)
+    │   ├── services/              # Gemini AI & RAG Vector Engine business logic
+    │   ├── middleware/            # Safety crisis interceptor & rate limiter
+    │   ├── vectorStore/           # CBT & mental health knowledge base vectors
+    │   └── app.ts                 # Express application initialization
+    ├── public/                    # Interactive web UI frontend
+    ├── Dockerfile                 # Multi-stage production container build
+    ├── .github/workflows/         # Keyless GCP Cloud Run WIF deploy workflow
     └── package.json
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start (Local Development)
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) v18+
-- A [Google Gemini API Key](https://ai.google.dev/) (free tier available)
+- Node.js v18 or v20
+- Docker Desktop (Optional)
+- Google Gemini API Key ([Get one free](https://ai.google.dev/))
 
-### Installation
+### Installation & Run
 
 ```bash
-# Clone the repository
+# 1. Clone repo
 git clone https://github.com/Devansh8954/node-Gemini-project.git
 cd "node Gemini project/Nodejs_gemini-main"
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Configure environment
+# 3. Configure Environment
 cp .env.example .env
-# Add your API keys to .env:
-# GEMINI_API_KEY=your_gemini_api_key_here
+# Add your GEMINI_API_KEY to .env
+
+# 4. Start local development server
+npm run dev
 ```
 
-### Running the Servers
+Visit `http://localhost:3000` in your browser.
+
+---
+
+## 🐳 Docker Deployment
 
 ```bash
-# Basic chat server
-node server.js
+# Build Docker image
+docker build -t ai-rag-wellness-assistant .
 
-# BMI AI Analyzer
-node server_bmi.js
-
-# Interactive multi-turn chat
-node server_interactive_chat.js
-
-# Streaming server
-node server_text_stream.js
+# Run container locally
+docker run -d -p 3000:3000 --env-file .env ai-rag-wellness-assistant
 ```
 
 ---
 
-## 📡 API Examples
+## 📡 Key API Endpoints
 
-### Chat Completion
-
-```bash
-curl -X POST http://localhost:3000/api/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Explain quantum computing in simple terms"}'
-```
-
-### BMI AI Analysis
-
-```bash
-curl -X POST http://localhost:3000/api/bmi \
-  -H "Content-Type: application/json" \
-  -d '{"weight": 70, "height": 175, "age": 25, "gender": "male"}'
-```
-
-### Interactive Chat (Multi-turn)
-
-```bash
-curl -X POST http://localhost:3000/api/chat/interactive \
-  -H "Content-Type: application/json" \
-  -d '{"message": "Hello!", "history": []}'
-```
+| Endpoint | Method | Payload | Description |
+|---|---|---|---|
+| `/api/chat` | `POST` | `{"message": "string", "sessionId": "string"}` | RAG-augmented Gemini AI wellness conversation |
+| `/api/vision` | `POST` | `multipart/form-data` (image file) | Multimodal visual wellness environment analysis |
+| `/health` | `GET` | — | Liveness & readiness check for GCP Cloud Run |
 
 ---
 
-## ☁️ Deployment
+## 🎯 Key Architecture & Interview Highlights
 
-Configured for **Vercel** serverless deployment:
-
-```bash
-# Deploy to Vercel
-npm install -g vercel
-vercel --prod
-```
-
-Add `GEMINI_API_KEY` to your Vercel environment variables in the dashboard.
-
----
-
-## 💡 Key Concepts Demonstrated
-
-- ✅ Google Gemini SDK integration with Node.js
-- ✅ Streaming AI responses with `generateContentStream()`
-- ✅ Multi-turn chat history management
-- ✅ Environment-based API key security with dotenv
-- ✅ RESTful API design for AI microservices
-- ✅ Serverless deployment with Vercel
+- **Why Custom RAG Vector Search?** Prevents LLM hallucinations by grounding responses in verified CBT wellness documentation using TF-IDF vector similarity.
+- **Safety Interception Pattern:** Prevents dangerous queries from reaching the AI model by running early-gate keyword matching for instant emergency redirection.
+- **Keyless GCP Authentication:** CI/CD uses Google Cloud Workload Identity Federation (WIF), eliminating long-lived service account JSON keys.
 
 ---
 
@@ -161,8 +163,9 @@ Add `GEMINI_API_KEY` to your Vercel environment variables in the dashboard.
 
 **Built with ❤️ by [Devansh Tyagi](https://github.com/Devansh8954)**
 
-⭐ Star this repo if you found it useful!
+[![Live Platform](https://img.shields.io/badge/Live_Platform-28a745?style=for-the-badge&logo=googlecloud&logoColor=white)](https://ai-rag-wellness-assistant-266670750120.asia-south1.run.app)
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4285F4,100:34A853&height=100&section=footer" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:4285F4,50:6f42c1,100:34A853&height=100&section=footer" width="100%"/>
 
 </div>
+
