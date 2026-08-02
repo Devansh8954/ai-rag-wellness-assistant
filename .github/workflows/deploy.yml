@@ -19,8 +19,8 @@ env:
 
 jobs:
   # ── Job 1: Lint & Test ───────────────────────────────────────────────────────
-  test-and-lint:
-    name: Lint and Test Gate
+  ci:
+    name: Continuous Integration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,9 +36,9 @@ jobs:
       - run: npm test
 
   # ── Job 2: Deploy to GCP Cloud Run ───────────────────────────────────────────
-  deploy:
-    name: Deploy to GCP Cloud Run
-    needs: test-and-lint
+  cd:
+    name: Continuous Deployment
+    needs: ci
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
