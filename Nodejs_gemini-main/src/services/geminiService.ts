@@ -9,12 +9,10 @@ Disclaimer: You are an AI assistant, not a licensed therapist or physician. Alwa
 
 export class GeminiService {
   private googleAI: GoogleGenerativeAI | null = null;
-  // Try primary model first, then fallbacks in order
-  private readonly fallbackModels: string[];
+  private modelName: string;
 
   constructor() {
-    const primary = config.geminiModel || 'gemini-3.6-flash';
-    this.fallbackModels = [...new Set([primary, 'gemini-3.6-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'])];
+    this.modelName = config.geminiModel || 'gemini-3.6-flash';
 
     if (config.geminiApiKey) {
       this.googleAI = new GoogleGenerativeAI(config.geminiApiKey);
@@ -36,8 +34,14 @@ export class GeminiService {
       '\nPlease provide a warm, empathetic response grounded in the provided context and techniques where applicable.',
     ].filter(Boolean).join('\n\n');
 
-    const result = await this.callWithFallback(augmented);
-    return result ?? this.getMockResponse(userPrompt, contextSnippet, 'All models unavailable');
+    try {
+      const model = this.googleAI.getGenerativeModel({ model: this.modelName });
+      const result = await model.generateContent(augmented);
+      return result.response.text();
+    } catch (err) {
+      logger.warn(`Gemini model "${this.modelName}" failed`, { error: (err as Error).message });
+      return this.getMockResponse(userPrompt, contextSnippet, (err as Error).message);
+    }
   }
 
   /** Analyze an uploaded image from a wellness perspective */
@@ -45,24 +49,15 @@ export class GeminiService {
     if (!this.googleAI) return 'Mock Image Analysis: A peaceful setting conducive for stress relief and mindfulness.';
 
     const imagePart = { inlineData: { data: imageBuffer.toString('base64'), mimeType } };
-    const parts = [promptText || 'Analyze this image from a wellness perspective:', imagePart] as object[];
-    const result = await this.callWithFallback(parts);
-    return result ?? 'Unable to analyze image. Please verify the API key and image format.';
-  }
-
-  /** Try each model in order; returns first success or null on total failure */
-  private async callWithFallback(prompt: string | object[]): Promise<string | null> {
-    for (const model of this.fallbackModels) {
-      try {
-        const m = this.googleAI!.getGenerativeModel({ model });
-        // The SDK accepts string or Part[] — cast via unknown to satisfy strict TS
-        const result = await m.generateContent(prompt as unknown as string);
-        return result.response.text();
-      } catch (err) {
-        logger.warn(`Gemini model "${model}" failed`, { error: (err as Error).message });
-      }
+    const prompt = promptText || 'Analyze this image from a wellness perspective:';
+    try {
+      const model = this.googleAI.getGenerativeModel({ model: this.modelName });
+      const result = await model.generateContent([prompt, imagePart] as unknown as string);
+      return result.response.text();
+    } catch (err) {
+      logger.warn('Gemini image analysis failed', { error: (err as Error).message });
+      return 'Unable to analyze image. Please verify the API key and image format.';
     }
-    return null;
   }
 
   /** Evidence-based static response when the API is unavailable */

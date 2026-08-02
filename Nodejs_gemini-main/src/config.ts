@@ -1,10 +1,7 @@
 import dotenv from 'dotenv';
-import path from 'path';
 
-// Load .env from multiple possible locations (root, src, and two levels up)
-['.env', '../.env', '../../.env'].forEach((p) =>
-  dotenv.config({ path: path.resolve(__dirname, p) })
-);
+// Load environment variables from .env file
+dotenv.config();
 
 export interface AppConfig {
   port: number;

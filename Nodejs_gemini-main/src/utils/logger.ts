@@ -1,20 +1,12 @@
-import winston from 'winston';
 import config from '../config';
 
-// Dev: human-readable; Prod: structured JSON
-const devFmt = winston.format.printf(({ level, message, timestamp, ...meta }) => {
-  const metaStr = Object.keys(meta).length ? JSON.stringify(meta) : '';
-  return `[${timestamp}] ${level.toUpperCase()}: ${message} ${metaStr}`;
-});
+const isTest = config.nodeEnv === 'test';
 
-export const logger = winston.createLogger({
-  level: config.nodeEnv === 'test' ? 'error' : 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    config.nodeEnv === 'production' ? winston.format.json() : devFmt
-  ),
-  transports: [new winston.transports.Console()],
-});
+export const logger = {
+  info: (msg: string, meta?: object) => !isTest && console.log(`[INFO] ${msg}`, meta ? JSON.stringify(meta) : ''),
+  warn: (msg: string, meta?: object) => !isTest && console.warn(`[WARN] ${msg}`, meta ? JSON.stringify(meta) : ''),
+  error: (msg: string, meta?: object) => console.error(`[ERROR] ${msg}`, meta ? JSON.stringify(meta) : ''),
+  debug: (msg: string, meta?: object) => config.nodeEnv === 'development' && console.debug(`[DEBUG] ${msg}`, meta ? JSON.stringify(meta) : ''),
+};
 
 export default logger;
