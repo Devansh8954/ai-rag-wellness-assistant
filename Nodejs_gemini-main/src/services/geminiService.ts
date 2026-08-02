@@ -3,116 +3,80 @@ import config from '../config';
 import logger from '../utils/logger';
 import { ChatMessage } from './sessionMemory';
 
+const SYSTEM_DIRECTIVE = `You are an empathetic, evidence-based AI Mental Health & Wellness Assistant.
+Your goal is to provide supportive, compassionate, and practical guidance based on verified psychological techniques.
+Disclaimer: You are an AI assistant, not a licensed therapist or physician. Always advise consulting a medical professional for medical emergencies.`;
+
 export class GeminiService {
   private googleAI: GoogleGenerativeAI | null = null;
-  private modelName: string;
-  private fallbackModels: string[];
+  // Try primary model first, then fallbacks in order
+  private readonly fallbackModels: string[];
 
   constructor() {
-    this.modelName = config.geminiModel || 'gemini-3.6-flash';
-    this.fallbackModels = Array.from(new Set([
-      this.modelName,
-      'gemini-3.6-flash',
-      'gemini-2.0-flash-lite',
-      'gemini-2.0-flash',
-    ]));
+    const primary = config.geminiModel || 'gemini-3.6-flash';
+    this.fallbackModels = [...new Set([primary, 'gemini-3.6-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'])];
 
     if (config.geminiApiKey) {
       this.googleAI = new GoogleGenerativeAI(config.geminiApiKey);
     } else {
-      logger.warn('GEMINI_API_KEY environment variable is not configured. AI fallback mode active.');
+      logger.warn('GEMINI_API_KEY not set — AI fallback mode active.');
     }
   }
 
-  /**
-   * Generates AI Response with RAG Context + Session History and automatic Model Fallback
-   */
-  public async generateRAGResponse(
-    userPrompt: string,
-    contextSnippet: string,
-    history: ChatMessage[] = []
-  ): Promise<string> {
-    if (!this.googleAI) {
-      return this.getMockResponse(userPrompt, contextSnippet);
-    }
+  /** Generate a RAG-augmented response with optional conversation history */
+  public async generateRAGResponse(userPrompt: string, contextSnippet: string, history: ChatMessage[] = []): Promise<string> {
+    if (!this.googleAI) return this.getMockResponse(userPrompt, contextSnippet);
 
-    const historyFormatted = history
-      .map((h) => `${h.role === 'user' ? 'User' : 'Assistant'}: ${h.content}`)
-      .join('\n');
+    const historyText = history.map((h) => `${h.role === 'user' ? 'User' : 'Assistant'}: ${h.content}`).join('\n');
+    const augmented = [
+      SYSTEM_DIRECTIVE,
+      contextSnippet && `VERIFIED RAG KNOWLEDGE BASE CONTEXT:\n${contextSnippet}`,
+      historyText && `CONVERSATION HISTORY:\n${historyText}`,
+      `CURRENT USER MESSAGE: ${userPrompt}`,
+      '\nPlease provide a warm, empathetic response grounded in the provided context and techniques where applicable.',
+    ].filter(Boolean).join('\n\n');
 
-    const systemDirective = `You are an empathetic, evidence-based AI Mental Health & Wellness Assistant. 
-Your goal is to provide supportive, compassionate, and practical guidance based on verified psychological techniques.
-Disclaimer: You are an AI assistant, not a licensed therapist or physician. Always advise consulting a medical professional for medical emergencies.`;
-
-    const augmentedPrompt = `${systemDirective}
-
-${contextSnippet ? `VERIFIED RAG KNOWLEDGE BASE CONTEXT:\n${contextSnippet}\n\n` : ''}${historyFormatted ? `CONVERSATION HISTORY:\n${historyFormatted}\n\n` : ''}CURRENT USER MESSAGE: ${userPrompt}
-
-Please provide a warm, empathetic response grounded in the provided context and techniques where applicable.`;
-
-    let lastError: Error | null = null;
-
-    for (const modelToTry of this.fallbackModels) {
-      try {
-        const model = this.googleAI.getGenerativeModel({ model: modelToTry });
-        const result = await model.generateContent(augmentedPrompt);
-        const responseText = result.response.text();
-        return responseText;
-      } catch (error) {
-        lastError = error as Error;
-        logger.warn(`Gemini API call failed for model ${modelToTry}`, { error: lastError.message });
-      }
-    }
-
-    const errorMessage = lastError ? lastError.message : 'All Gemini models unavailable';
-    logger.error('Gemini API call error across all candidate models', { error: errorMessage });
-    return this.getMockResponse(userPrompt, contextSnippet, errorMessage);
+    const result = await this.callWithFallback(augmented);
+    return result ?? this.getMockResponse(userPrompt, contextSnippet, 'All models unavailable');
   }
 
-  /**
-   * Multimodal Image Analysis
-   */
+  /** Analyze an uploaded image from a wellness perspective */
   public async analyzeImage(promptText: string, imageBuffer: Buffer, mimeType: string): Promise<string> {
-    if (!this.googleAI) {
-      return 'Mock Image Analysis: The image shows a peaceful environmental setting conducive for stress relief and mindfulness.';
-    }
+    if (!this.googleAI) return 'Mock Image Analysis: A peaceful setting conducive for stress relief and mindfulness.';
 
-    const imagePart = {
-      inlineData: {
-        data: imageBuffer.toString('base64'),
-        mimeType,
-      },
-    };
-
-    for (const modelToTry of this.fallbackModels) {
-      try {
-        const model = this.googleAI.getGenerativeModel({ model: modelToTry });
-        const result = await model.generateContent([promptText || 'Analyze this image from a wellness perspective:', imagePart]);
-        return result.response.text();
-      } catch (error) {
-        logger.warn(`Gemini Multimodal image analysis failed for model ${modelToTry}`, { error: (error as Error).message });
-      }
-    }
-
-    return 'Unable to analyze image. Please ensure the API key is valid and image format is supported.';
+    const imagePart = { inlineData: { data: imageBuffer.toString('base64'), mimeType } };
+    const parts = [promptText || 'Analyze this image from a wellness perspective:', imagePart] as object[];
+    const result = await this.callWithFallback(parts);
+    return result ?? 'Unable to analyze image. Please verify the API key and image format.';
   }
 
-  private getMockResponse(userPrompt: string, contextSnippet: string, apiError?: string): string {
-    let hint = '(Note: Set a valid GEMINI_API_KEY in .env for live AI responses).';
-    if (apiError) {
-      if (apiError.includes('429') || apiError.toLowerCase().includes('quota')) {
-        hint = '(Note: Gemini API free tier rate limit reached. Serving evidence-based RAG response.)';
-      } else if (apiError.includes('401') || apiError.includes('403') || apiError.includes('API key')) {
-        hint = '(Note: Please verify GEMINI_API_KEY in .env)';
-      } else {
-        hint = `(Note: Gemini API temporarily unavailable - ${apiError.substring(0, 100)}...)`;
+  /** Try each model in order; returns first success or null on total failure */
+  private async callWithFallback(prompt: string | object[]): Promise<string | null> {
+    for (const model of this.fallbackModels) {
+      try {
+        const m = this.googleAI!.getGenerativeModel({ model });
+        // The SDK accepts string or Part[] — cast via unknown to satisfy strict TS
+        const result = await m.generateContent(prompt as unknown as string);
+        return result.response.text();
+      } catch (err) {
+        logger.warn(`Gemini model "${model}" failed`, { error: (err as Error).message });
       }
     }
+    return null;
+  }
 
-    if (contextSnippet) {
-      return `[RAG Assisted Guidance]\n\nBased on established wellness techniques:\n${contextSnippet.split('\n\n')[0]}\n\nRemember to take deep, intentional breaths and take things one step at a time. ${hint}`;
+  /** Evidence-based static response when the API is unavailable */
+  private getMockResponse(userPrompt: string, contextSnippet: string, apiError?: string): string {
+    let hint = '(Set a valid GEMINI_API_KEY in .env for live AI responses.)';
+    if (apiError) {
+      if (/429|quota/i.test(apiError))   hint = '(Gemini free-tier rate limit reached — serving RAG response.)';
+      else if (/401|403|API key/i.test(apiError)) hint = '(Please verify GEMINI_API_KEY in .env.)';
+      else hint = `(Gemini temporarily unavailable — ${apiError.substring(0, 100)}...)`;
     }
-    return `Thank you for sharing. It sounds like you are navigating a thoughtful moment regarding "${userPrompt}". Practicing deep breathing (Box Breathing: 4s inhale, 4s hold, 4s exhale) can help calm your nervous system. ${hint}`;
+
+    return contextSnippet
+      ? `[RAG Assisted Guidance]\n\nBased on established wellness techniques:\n${contextSnippet.split('\n\n')[0]}\n\nRemember to breathe deeply and take things one step at a time. ${hint}`
+      : `Thank you for sharing. It sounds like you are reflecting on "${userPrompt}". Box Breathing (4s inhale → 4s hold → 4s exhale) can help calm your nervous system. ${hint}`;
   }
 }
 

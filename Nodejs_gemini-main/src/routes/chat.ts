@@ -6,94 +6,58 @@ import { sessionMemory } from '../services/sessionMemory';
 import { safetyGuardrails } from '../middleware/safetyGuardrails';
 import logger from '../utils/logger';
 
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-});
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 export const chatRouter = Router();
 
-/**
- * POST /api/chat
- * Primary RAG-assisted Chat endpoint
- */
+/** POST /api/chat — RAG-assisted chat with session memory */
 chatRouter.post('/chat', safetyGuardrails, async (req: Request, res: Response) => {
+  const prompt = req.body.prompt || req.body.question;
+  const sessionId: string = req.body.sessionId || 'default-session';
+
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+    res.status(400).json({ error: 'Prompt is required' });
+    return;
+  }
+
   try {
-    const prompt = req.body.prompt || req.body.question;
-    const sessionId = (req.body.sessionId as string) || 'default-session';
-
-    if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
-      res.status(400).json({ error: 'Prompt is required' });
-      return;
-    }
-
-    // Step 1: Vector RAG Retrieval
-    const ragResult = ragEngine.retrieve(prompt, 2);
-
-    // Step 2: Fetch Conversation History
-    const history = sessionMemory.getHistory(sessionId);
-
-    // Step 3: Generate AI Response
-    const responseText = await geminiService.generateRAGResponse(
-      prompt,
-      ragResult.contextSnippet,
-      history
+    const ragResult   = ragEngine.retrieve(prompt, 2);                              // 1. Vector retrieval
+    const history     = sessionMemory.getHistory(sessionId);                        // 2. Session history
+    const responseText = await geminiService.generateRAGResponse(                   // 3. AI generation
+      prompt, ragResult.contextSnippet, history
     );
 
-    // Step 4: Record Memory
-    sessionMemory.addMessage(sessionId, 'user', prompt);
+    sessionMemory.addMessage(sessionId, 'user', prompt);                            // 4. Persist memory
     sessionMemory.addMessage(sessionId, 'model', responseText);
 
     res.json({
       sessionId,
       response: responseText,
-      ragContext: ragResult.documents.map((d) => ({
-        id: d.id,
-        title: d.title,
-        category: d.category,
-      })),
+      ragContext: ragResult.documents.map(({ id, title, category }) => ({ id, title, category })),
       relevanceScores: ragResult.scores,
     });
   } catch (error) {
-    logger.error('Error handling /api/chat request', { error: (error as Error).message });
+    logger.error('Error in /api/chat', { error: (error as Error).message });
     res.status(500).json({ error: 'Failed to process chat request' });
   }
 });
 
-/**
- * POST /api/analyze-image
- * Multimodal Image Upload & Analysis
- */
+/** POST /api/analyze-image — Multimodal image upload & wellness analysis */
 chatRouter.post('/analyze-image', upload.single('image'), async (req: Request, res: Response) => {
+  if (!req.file) { res.status(400).json({ error: 'Image file is required' }); return; }
+
+  const promptText = (req.body.prompt as string) || 'Analyze this image from a wellness perspective';
   try {
-    if (!req.file) {
-      res.status(400).json({ error: 'Image file is required' });
-      return;
-    }
-
-    const promptText = (req.body.prompt as string) || 'Analyze this image from a wellness perspective';
-    const resultText = await geminiService.analyzeImage(
-      promptText,
-      req.file.buffer,
-      req.file.mimetype
-    );
-
-    res.json({
-      prompt: promptText,
-      analysis: resultText,
-    });
+    const analysis = await geminiService.analyzeImage(promptText, req.file.buffer, req.file.mimetype);
+    res.json({ prompt: promptText, analysis });
   } catch (error) {
-    logger.error('Error handling /api/analyze-image', { error: (error as Error).message });
+    logger.error('Error in /api/analyze-image', { error: (error as Error).message });
     res.status(500).json({ error: 'Failed to analyze image' });
   }
 });
 
-/**
- * DELETE /api/chat/memory/:sessionId
- * Clear session memory
- */
+/** DELETE /api/chat/memory/:sessionId — Clear session conversation history */
 chatRouter.delete('/chat/memory/:sessionId', (req: Request, res: Response) => {
-  const sessionId = req.params.sessionId;
-  sessionMemory.clearSession(sessionId);
-  res.json({ message: `Session memory cleared for session ${sessionId}` });
+  sessionMemory.clearSession(req.params.sessionId);
+  res.json({ message: `Session memory cleared for session ${req.params.sessionId}` });
 });

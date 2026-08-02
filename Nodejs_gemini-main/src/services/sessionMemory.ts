@@ -7,35 +7,26 @@ export interface ChatMessage {
 }
 
 export class SessionMemoryService {
-  private sessions: Map<string, ChatMessage[]>;
-  private maxHistoryPerSession: number;
+  private sessions = new Map<string, ChatMessage[]>();
+  private readonly maxHistory: number;
 
   constructor(maxHistory = 10) {
-    this.sessions = new Map();
-    this.maxHistoryPerSession = maxHistory;
+    this.maxHistory = maxHistory;
   }
 
   public getHistory(sessionId: string): ChatMessage[] {
-    return this.sessions.get(sessionId) || [];
+    return this.sessions.get(sessionId) ?? [];
   }
 
   public addMessage(sessionId: string, role: 'user' | 'model', content: string): void {
-    if (!this.sessions.has(sessionId)) {
-      this.sessions.set(sessionId, []);
-    }
+    const history = this.sessions.get(sessionId) ?? [];
+    history.push({ role, content, timestamp: new Date() });
 
-    const history = this.sessions.get(sessionId)!;
-    history.push({
-      role,
-      content,
-      timestamp: new Date(),
-    });
+    // Keep last N*2 messages (N turns = N user + N model messages)
+    const trimmed = history.length > this.maxHistory * 2 ? history.slice(-this.maxHistory * 2) : history;
+    this.sessions.set(sessionId, trimmed);
 
-    if (history.length > this.maxHistoryPerSession * 2) {
-      this.sessions.set(sessionId, history.slice(-this.maxHistoryPerSession * 2));
-    }
-
-    logger.debug('Session message appended', { sessionId, role, totalMessages: history.length });
+    logger.debug('Session message appended', { sessionId, role, totalMessages: trimmed.length });
   }
 
   public clearSession(sessionId: string): void {

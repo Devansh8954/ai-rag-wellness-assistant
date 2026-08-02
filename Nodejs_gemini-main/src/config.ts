@@ -1,10 +1,10 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load environment variables from standard cwd as well as relative package locations
-dotenv.config();
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load .env from multiple possible locations (root, src, and two levels up)
+['.env', '../.env', '../../.env'].forEach((p) =>
+  dotenv.config({ path: path.resolve(__dirname, p) })
+);
 
 export interface AppConfig {
   port: number;
